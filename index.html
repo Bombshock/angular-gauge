@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>svg test</title>
+
+        <style>
+
+            body, html {
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                margin: 0;
+                overflow: hidden;
+            }
+
+            path {
+                opacity: 0.5;
+                cursor: pointer;
+            }
+
+            path:hover {
+                opacity: 1;
+            }
+
+            #button-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+
+            #button-container button {
+                cursor: pointer;
+                background-color: #406aae;
+                color: #FFF;
+                border-radius: 4px;
+                padding: 10px 25px;
+                border: 0;
+                margin: 5px;
+            }
+
+            .gauge-container text.hl {
+                font-size: 300%;
+            }
+
+            .gauge-container text {
+                font-family: Calibri;
+            }
+
+        </style>
+
+    </head>
+    <body ng-app="demo">
+
+        <gauge data="data" data-mode="{{mode}}" data-max="{{max}}" data-show-percent="showPercent" data-show-sub-percent="true" data-on-hover="hover($event, $path)"></gauge>
+
+        <div id="button-container">
+            <button ng-click="mode == 'gauge' ? mode = 'circle' : mode = 'gauge'">mode</button>
+            <button ng-click="randomizedata()">rnd</button>
+            <button ng-click="preloader()">load</button>
+        </div>
+
+        <script src="https://code.angularjs.org/1.5.0/angular.js"></script>
+        <script src="angular-gauge.js"></script>
+        <script src="demo.js"></script>
+    </body>
+</html>
