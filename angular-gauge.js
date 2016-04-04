@@ -12,14 +12,15 @@
   function GaugeConfig() {
     return {
       colors: ["#c25e03", "#b27f1a", "#df9906", "#698a0e", "#ad2725", "#406aae", "#282828", "#e7e7e7", "#666666"],
-      gutter: 1.5,
+      gutter: 1,
       animationSpeed: {
         build: 700,
         rebuild: 300
       },
       arc: {
         strokeWidth: "20%",
-        radius: 190
+        radius: 190,
+        startDegree: -90
       },
       easing: Math.easeInOutQuad
     };
@@ -80,14 +81,14 @@
         onHover: '&'
       },
       link: function (scope, element) {
-        var svg = element[0];
-        var container = element.parent()[0];
-        var fullCycle;
-        var maxValue = 0;
         var __MODES__ = {
           CIRCLE: "circle",
           GAUGE: "gauge"
         };
+
+        var svg = element[0];
+        var fullCycle;
+        var maxValue = 0;
         var mode = scope.$mode = scope.mode || __MODES__.CIRCLE;
         var colors = scope.colors || gaugeConfig.colors;
         var gutter = scope.gutter || gaugeConfig.gutter;
@@ -95,33 +96,16 @@
 
         scope.$paths = [];
 
-        $window.addEventListener("resize", init);
-        scope.$on("$destroy", function () {
-          $window.removeEventListener("resize", init);
-        });
-
-        init();
-        function init() {
-          element.css("width", "auto");
-          element.css("height", "auto");
-
-          element.css("width", container.offsetWidth + 'px');
-          element.css("height", container.offsetHeight + 'px');
-
-          element.css("display", "block");
-          if (scope.mode === __MODES__.GAUGE) {
-            svg.setAttribute("viewBox", "0 0 500 250");
-          } else {
-            svg.setAttribute("viewBox", "0 0 500 500");
-          }
-        }
-
         scope.$watch("mode", function (newMode) {
           if (newMode) {
             scope.$mode = mode = newMode || __MODES__.CIRCLE;
-            init();
             genFullCycle();
             buildArcs();
+          }
+          if (mode === __MODES__.GAUGE) {
+            svg.setAttribute("viewBox", "0 0 500 250");
+          } else {
+            svg.setAttribute("viewBox", "0 0 500 500");
           }
         });
 
@@ -238,7 +222,7 @@
         }
 
         function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-          var angleInRadians = (angleInDegrees - 180) * Math.PI / 180.0;
+          var angleInRadians = (angleInDegrees - 90 + (gaugeConfig.arc.startDegree || 0)) * Math.PI / 180.0;
 
           return {
             x: centerX + (radius * Math.cos(angleInRadians)),
@@ -247,7 +231,6 @@
         }
 
         function describeArc(x, y, radius, startAngle, endAngle) {
-
           var start = polarToCartesian(x, y, radius, endAngle);
           var end = polarToCartesian(x, y, radius, startAngle);
 
@@ -274,7 +257,7 @@
               var endVal = gaugeConfig.easing(progress, path.data.endAngleIs, path.data.endAngle - path.data.endAngleIs, durration);
               path.data.currentStart = startVal;
               path.data.currentEnd = endVal;
-              path.d = describeArc(250, 250, 190, startVal, endVal);
+              path.d = describeArc(250, 250, gaugeConfig.arc.radius || 190, startVal, endVal);
             });
 
             if (progress < durration) {
@@ -284,7 +267,7 @@
               scope.$paths.forEach(function (path) {
                 path.data.startAngleIs = path.data.startAngle;
                 path.data.endAngleIs = path.data.endAngle;
-                path.d = describeArc(250, 250, 190, path.data.startAngle, path.data.endAngle);
+                path.d = describeArc(250, 250, gaugeConfig.arc.radius || 190, path.data.startAngle, path.data.endAngle);
               });
             }
 
