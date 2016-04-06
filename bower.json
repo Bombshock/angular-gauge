@@ -15,7 +15,7 @@
     "bower_components",
     "test",
     "tests",
-    "dev.js",
+    "demo.js",
     "index.html"
   ]
 }
